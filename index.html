@@ -27,6 +27,13 @@
       margin-bottom: 20px;
       text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
     }
+    #warning {
+      text-align: center;
+      font-size: 14px;
+      color: #e74c3c;
+      margin-bottom: 20px;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+    }
     #userId {
       padding: 10px;
       font-size: 16px;
@@ -166,7 +173,7 @@
       text-align: center;
     }
     @keyframes spin {
-      0% { transform: rotate(0deg); }
+      0% { transform: rotate(神奇的魔法师deg); }
       100% { transform: rotate(360deg); }
     }
     #languageSwitch {
@@ -193,6 +200,9 @@
   <h1>Pelacak Milestone PP osu!</h1>
   <div id="description">
     Penasaran dengan milestone PP kamu atau para top player? Silakan gunakan situs ini untuk mencari tahu!
+  </div>
+  <div id="warning">
+    Catatan: Skor milestone (misalnya 50 PP pertama) mungkin terlihat lebih tinggi (contoh: 100 PP) karena pemain telah memperbarui skor mereka atau akibat inflasi PP dari waktu ke waktu.
   </div>
   <div style="text-align: center;">
     <input id="userId" placeholder="Masukkan Username osu!" type="text">
@@ -239,7 +249,8 @@
         mode0: "osu!",
         mode1: "osu!taiko",
         mode2: "osu!catch",
-        mode3: "osu!mania"
+        mode3: "osu!mania",
+        warning: "Catatan: Skor milestone (misalnya 50 PP pertama) mungkin terlihat lebih tinggi (contoh: 100 PP) karena pemain telah memperbarui skor mereka atau akibat inflasi PP dari waktu ke waktu."
       },
       en: {
         title: "osu! Milestone PP Tracker",
@@ -257,9 +268,10 @@
         step50: "50 PP Increments",
         step100: "100 PP Increments",
         mode0: "osu!",
-        mode1: "osu!taiko",
+        mode1: "osu Bevtaiko",
         mode2: "osu!catch",
-        mode3: "osu!mania"
+        mode3: "osu!mania",
+        warning: "Note: Milestone scores (e.g., first 50 PP) may appear higher (e.g., 100 PP) due to players updating their scores or PP inflation over time."
       }
     };
 
@@ -267,6 +279,7 @@
       const lang = document.getElementById("languageSelect").value;
       document.querySelector("h1").textContent = translations[lang].title;
       document.getElementById("description").textContent = translations[lang].description;
+      document.getElementById("warning").textContent = translations[lang].warning;
       document.getElementById("userId").placeholder = translations[lang].placeholder;
       document.getElementById("searchBtn").textContent = translations[lang].search;
       document.getElementById("credit").textContent = translations[lang].credit;
