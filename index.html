@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pelacak Milestone PP osu!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+      position: relative;
+      min-height: 100vh;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    #description {
+      text-align: center;
+      font-size: 18px;
+      color: #34495e;
+      margin-bottom: 20px;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+    }
+    #userId {
+      padding: 10px;
+      font-size: 16px;
+      width: 300px;
+      margin-right: 10px;
+      border: 1px solid #bdc3c7;
+      border-radius: 5px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    #milestoneStep, #gameMode {
+      padding: 10px;
+      font-size: 16px;
+      margin-right: 10px;
+      border: 1px solid #bdc3c7;
+      border-radius: 5px;
+      font-family: 'Roboto', 'Segoe UI', sans-serif;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.1s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    button:hover {
+      background-color: #2980b9;
+      transform: translateY(-1px);
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #results {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .milestone-card {
+      width: 300px;
+      height: 220px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 15px;
+      transition: transform 0.2s;
+    }
+    .milestone-card:hover {
+      transform: scale(1.02);
+    }
+    .milestone-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+    .milestone-card * {
+      position: relative;
+      z-index: 2;
+    }
+    .milestone-card h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .milestone-card p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    .milestone-card a {
+      color: #66b0ff;
+      text-decoration: none;
+    }
+    .milestone-card a:hover {
+      text-decoration: underline;
+    }
+    #credit {
+      text-align: center;
+      font-size: 12px;
+      color: #7f8c8d;
+      margin-top: 20px;
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+    }
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s ease-in-out infinite;
+      position: relative;
+    }
+    .loader::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 30px;
+      height: 30px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #66b0ff;
+      border-radius: 50%;
+      animation: spin 1.5s ease-in-out infinite reverse;
+    }
+    #loadingText {
+      color: white;
+      font-size: 18px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #languageSwitch {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    #languageSwitch select {
+      padding: 5px;
+      font-size: 14px;
+      border-radius: 5px;
+      border: 1px solid #bdc3c7;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="languageSwitch">
+    <select id="languageSelect" onchange="changeLanguage()">
+      <option value="id" selected>Bahasa Indonesia</option>
+      <option value="en">English</option>
+    </select>
+  </div>
+  <h1>Pelacak Milestone PP osu!</h1>
+  <div id="description">
+    Penasaran dengan milestone PP kamu atau para top player? Silakan gunakan situs ini untuk mencari tahu!
+  </div>
+  <div style="text-align: center;">
+    <input id="userId" placeholder="Masukkan Username osu!" type="text">
+    <select id="gameMode">
+      <option value="0" selected>osu!</option>
+      <option value="1">osu!taiko</option>
+      <option value="2">osu!catch</option>
+      <option value="3">osu!mania</option>
+    </select>
+    <select id="milestoneStep">
+      <option value="50">Kelipatan 50 PP</option>
+      <option value="100" selected>Kelipatan 100 PP</option>
+    </select>
+    <button id="searchBtn" onclick="fetchMilestones()">Cari</button>
+  </div>
+  <div id="credit">
+    Situs web oleh Sanvie dengan API osu! dan osu!track
+  </div>
+  <div id="results"></div>
+  <div id="loadingOverlay">
+    <div class="loader"></div>
+    <div id="loadingText">Tunggu sebentar, sedang mengambil data...</div>
+  </div>
+
+  <script>
+    const OSU_API_KEY = "11c9450590f84943dec9c65649e4757b6f504657"; 
+
+    const translations = {
+      id: {
+        title: "Pelacak Milestone PP osu!",
+        description: "Penasaran dengan milestone PP kamu atau para top player? Silakan gunakan situs ini untuk mencari tahu!",
+        placeholder: "Masukkan Username osu!",
+        search: "Cari",
+        credit: "Situs web oleh Sanvie dengan API osu! dan osu!track",
+        loading: "Tunggu sebentar, sedang mengambil data...",
+        milestone: "{milestone} PP Pertama",
+        pp: "PP: {pp}",
+        mods: "Mods: {mods}",
+        time: "Waktu: {time}",
+        beatmap: "Beatmap: {beatmap}",
+        error: "Terjadi kesalahan saat mengambil data. Pastikan username benar atau coba lagi nanti.",
+        step50: "Kelipatan 50 PP",
+        step100: "Kelipatan 100 PP",
+        mode0: "osu!",
+        mode1: "osu!taiko",
+        mode2: "osu!catch",
+        mode3: "osu!mania"
+      },
+      en: {
+        title: "osu! Milestone PP Tracker",
+        description: "Curious about your PP milestones or those of top players? Use this website to find out!",
+        placeholder: "Enter osu! Username",
+        search: "Search",
+        credit: "Website by Sanvie with osu! and osu!track APIs",
+        loading: "Please wait, fetching data...",
+        milestone: "First {milestone} PP",
+        pp: "PP: {pp}",
+        mods: "Mods: {mods}",
+        time: "Time: {time}",
+        beatmap: "Beatmap: {beatmap}",
+        error: "An error occurred while fetching data. Ensure the username is correct or try again later.",
+        step50: "50 PP Increments",
+        step100: "100 PP Increments",
+        mode0: "osu!",
+        mode1: "osu!taiko",
+        mode2: "osu!catch",
+        mode3: "osu!mania"
+      }
+    };
+
+    function changeLanguage() {
+      const lang = document.getElementById("languageSelect").value;
+      document.querySelector("h1").textContent = translations[lang].title;
+      document.getElementById("description").textContent = translations[lang].description;
+      document.getElementById("userId").placeholder = translations[lang].placeholder;
+      document.getElementById("searchBtn").textContent = translations[lang].search;
+      document.getElementById("credit").textContent = translations[lang].credit;
+      document.getElementById("loadingText").textContent = translations[lang].loading;
+
+      const milestoneStep = document.getElementById("milestoneStep");
+      milestoneStep.options[0].text = translations[lang].step50;
+      milestoneStep.options[1].text = translations[lang].step100;
+
+      const gameMode = document.getElementById("gameMode");
+      gameMode.options[0].text = translations[lang].mode0;
+      gameMode.options[1].text = translations[lang].mode1;
+      gameMode.options[2].text = translations[lang].mode2;
+      gameMode.options[3].text = translations[lang].mode3;
+
+      const resultsDiv = document.getElementById("results");
+      if (resultsDiv.innerHTML) fetchMilestones();
+    }
+
+    async function fetchBeatmapDetails(beatmapId) {
+      const url = `https://osu.ppy.sh/api/get_beatmaps?k=${OSU_API_KEY}&b=${beatmapId}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data && data.length > 0) {
+          const beatmap = data[0];
+          return {
+            title: beatmap.title,
+            difficulty: beatmap.version,
+            beatmapset_id: beatmap.beatmapset_id,
+            beatmap_id: beatmap.beatmap_id
+          };
+        }
+        return null;
+      } catch (error) {
+        console.error("Error fetching beatmap details:", error);
+        return null;
+      }
+    }
+
+    function getModsString(mods) {
+      if (!mods || mods === 0) return "No Mods";
+      const modMap = {
+        1: "NF", 2: "EZ", 4: "TD", 8: "HD", 16: "HR", 32: "SD", 64: "DT",
+        128: "RX", 256: "HT", 512: "NC", 1024: "FL", 2048: "AP", 4096: "SO",
+        8192: "RX2", 16384: "PF"
+      };
+      let modList = [];
+      for (let bit in modMap) {
+        if (mods & bit) {
+          modList.push(modMap[bit]);
+        }
+      }
+      if (modList.includes("HD") && modList.includes("DT")) {
+        modList = modList.filter(mod => mod !== "HD" && mod !== "DT");
+        modList.push("HDDT");
+      } else if (modList.includes("HD") && modList.includes("HR")) {
+        modList = modList.filter(mod => mod !== "HD" && mod !== "HR");
+        modList.push("HDHR");
+      } else if (modList.includes("NC")) {
+        modList = modList.filter(mod => mod !== "DT");
+      }
+      return modList.length > 0 ? modList.join("") : "No Mods";
+    }
+
+    async function fetchMilestones() {
+      const username = document.getElementById("userId").value;
+      const step = parseInt(document.getElementById("milestoneStep").value);
+      const mode = document.getElementById("gameMode").value;
+      const searchBtn = document.getElementById("searchBtn");
+      const loadingOverlay = document.getElementById("loadingOverlay");
+      const lang = document.getElementById("languageSelect").value;
+
+      if (!username) {
+        alert(lang === "id" ? "Masukkan Username!" : "Enter Username!");
+        return;
+      }
+
+      searchBtn.disabled = true;
+      loadingOverlay.style.display = "flex";
+
+      const url = `https://osutrack-api.ameo.dev/hiscores?user=${username}&mode=${mode}&userMode=username`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const hiscores = await response.json();
+
+        if (!Array.isArray(hiscores) || hiscores.length === 0) {
+          throw new Error("No hiscores data returned");
+        }
+
+        const sortedHiscores = hiscores.sort((a, b) => new Date(a.score_time) - new Date(b.score_time));
+
+        let milestones = {};
+        let currentMaxPp = 0;
+        for (const score of sortedHiscores) {
+          const pp = score.pp;
+          if (pp > currentMaxPp) {
+            currentMaxPp = pp;
+            for (let milestone = step; milestone <= 2000; milestone += step) {
+              if (pp >= milestone && !milestones[milestone]) {
+                const beatmapDetails = await fetchBeatmapDetails(score.beatmap_id);
+                milestones[milestone] = {
+                  pp: pp,
+                  beatmap_id: score.beatmap_id,
+                  score_time: score.score_time || "Unknown time",
+                  beatmap_title: beatmapDetails ? beatmapDetails.title : "Unknown Beatmap",
+                  difficulty: beatmapDetails ? beatmapDetails.difficulty : "Unknown",
+                  beatmapset_id: beatmapDetails ? beatmapDetails.beatmapset_id : null,
+                  mods: score.mods || 0
+                };
+                break;
+              }
+            }
+          }
+        }
+
+        const resultsDiv = document.getElementById("results");
+        resultsDiv.innerHTML = "";
+        for (const [milestone, data] of Object.entries(milestones)) {
+          const beatmapLink = data.beatmapset_id
+            ? `<a href="https://osu.ppy.sh/beatmapsets/${data.beatmapset_id}#osu/${data.beatmap_id}" target="_blank">${data.beatmap_title} [${data.difficulty}]</a>`
+            : "No link available";
+          const backgroundImage = data.beatmapset_id
+            ? `https://assets.ppy.sh/beatmaps/${data.beatmapset_id}/covers/cover.jpg`
+            : "";
+          const modsString = getModsString(data.mods);
+          const formattedTime = data.score_time 
+            ? new Date(data.score_time).toLocaleString("en-GB", { 
+                year: "numeric", 
+                month: "2-digit", 
+                day: "2-digit", 
+                hour: "2-digit", 
+                minute: "2-digit" 
+              }).replace(/,/, "")
+            : lang === "id" ? "Waktu tidak diketahui" : "Unknown time";
+
+          const milestoneCard = document.createElement("div");
+          milestoneCard.className = "milestone-card";
+          milestoneCard.style.backgroundImage = backgroundImage ? `url('${backgroundImage}')` : "none";
+          milestoneCard.innerHTML = `
+            <div>
+              <h3>${translations[lang].milestone.replace("{milestone}", milestone)}</h3>
+              <p>${translations[lang].pp.replace("{pp}", data.pp.toFixed(2))}</p>
+              <p>${translations[lang].mods.replace("{mods}", modsString)}</p>
+              <p>${translations[lang].time.replace("{time}", formattedTime)}</p>
+              <p>${translations[lang].beatmap.replace("{beatmap}", beatmapLink)}</p>
+            </div>
+          `;
+          resultsDiv.appendChild(milestoneCard);
+        }
+      } catch (error) {
+        console.error("Error fetching milestones:", error);
+        document.getElementById("results").innerHTML = `<p>${translations[lang].error}</p>`;
+      } finally {
+        searchBtn.disabled = false;
+        loadingOverlay.style.display = "none";
+      }
+    }
+
+    changeLanguage();
+  </script>
+</body>
+</html>
