@@ -1,0 +1,1 @@
+const OSU_API_KEY = "342522072e2b9936c1c7b9f4fab2c6ec77d4f1f5";
