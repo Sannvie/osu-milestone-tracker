@@ -22,7 +22,7 @@
     Catatan: Skor milestone menunjukkan PP awal saat pertama kali disubmit. Jika tidak ada skor untuk milestone tertentu, itu mungkin karena data historis tidak tersedia.
   </div>
   <div style="text-align: center;">
-    <input id="userId" placeholder="Masukkan Username osu!" type="text">
+    <input id="userId" placeholder="Masukkan Username osu!" type="text" onkeypress="if(event.keyCode === 13) fetchMilestones()">
     <select id="gameMode">
       <option value="0" selected>osu!</option>
       <option value="1">osu!taiko</option>
