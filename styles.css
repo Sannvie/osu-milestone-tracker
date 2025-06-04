@@ -95,7 +95,6 @@ body {
   font-weight: 500;
   color: #9683d3;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  text-align: center;
   position: relative;
   animation: fadeInUp 1.4s ease-out 0.4s;
   animation-fill-mode: both;
