@@ -212,7 +212,7 @@ async function fetchMilestones() {
     const scores = await fetchFromAPI(scoresUrl);
     console.log('Scores from API:', scores);
 
-    const highestPP = scores.length > 0 ? Math.max(...scores.map(s => s.pp)) : 0;
+    const highestPP = scores.length > 0 ? Math.round(Math.max(...scores.map(s => s.pp))) : 0;
     console.log('Highest PP:', highestPP);
     if (highestPP === 0) {
       resultsDiv.innerHTML = `<p style="color: #e74c3c; text-align: center;">${translations[currentLanguage].noScores}</p>`;
@@ -231,7 +231,7 @@ async function fetchMilestones() {
     for (const milestone of milestones) {
       const minPP = milestone;
       const maxPP = milestone + 49;
-      const score = scores.find(s => s.pp >= minPP && s.pp <= maxPP);
+      const score = scores.find(s => Math.round(s.pp) >= minPP && Math.round(s.pp) <= maxPP);
       milestoneScores.push({ milestone, score });
       console.log(`Milestone ${milestone}:`, score);
     }
@@ -250,7 +250,7 @@ async function fetchMilestones() {
           card.innerHTML = `
             <div>
               <h3>${texts.milestone}: ${milestone} PP</h3>
-              <p>${texts.pp}: ${score.pp.toFixed(2)}</p>
+              <p>${texts.pp}: ${Math.round(score.pp)}</p>
               <p>${texts.rank}: ${mapRank(score.rank)}</p>
               <p>${texts.beatmap}: <a href="https://osu.ppy.sh/b/${score.beatmap_id}" target="_blank">${beatmap.title} [${beatmap.version}]</a></p>
               <p>${texts.date}: ${formattedDate}</p>
@@ -281,11 +281,46 @@ async function fetchMilestones() {
   } catch (error) {
     console.error('Error fetching milestones:', error);
     resultsDiv.innerHTML = `<p style="color: #e74c3c; text-align: center;">Error fetching data. Please try again later.</p>`;
-    playerProfile.classList.remove('show'); 
+    playerProfile.classList.remove('show');
   } finally {
     toggleLoading(false);
     document.getElementById('searchBtn').disabled = false;
   }
+}
+
+function displayUserProfile(user) {
+  const avatarUrl = `https://a.ppy.sh/${user.user_id}`;
+  const playerAvatar = document.getElementById('playerAvatar');
+  const playerName = document.getElementById('playerName');
+  const playerStats = document.getElementById('playerStats');
+  const playerProfile = document.getElementById('playerProfile');
+  const playerInfo = document.getElementById('playerInfo');
+  const texts = translations[currentLanguage];
+
+  playerAvatar.src = avatarUrl;
+  playerAvatar.style.display = 'block';
+  playerAvatar.onerror = () => {
+    playerAvatar.src = 'https://osu.ppy.sh/images/layout/avatar-guest.png';
+    console.log('Failed to load avatar, using fallback');
+  };
+
+  playerName.innerText = user.username;
+
+  const stats = [
+    `${texts.pp}: ${Math.round(parseFloat(user.pp_raw))}`,
+    `#${user.pp_rank}`,
+    `Lv${parseFloat(user.level).toFixed(0)}`,
+    `${parseFloat(user.accuracy).toFixed(1)}%`,
+    user.country
+  ];
+  playerStats.innerHTML = stats.join('<br>');
+
+  playerInfo.classList.add('visible');
+  console.log('Profile content displayed');
+
+  playerProfile.onclick = () => {
+    window.open(`https://osu.ppy.sh/users/${user.user_id}`, '_blank');
+  };
 }
 function mapRank(rank) {
   if (rank === 'SH') return 'S+';
