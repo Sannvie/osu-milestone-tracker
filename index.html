@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>osu! Milestone PP Tracker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,30 +14,31 @@
       <option value="en" selected>English</option>
     </select>
   </div>
-  <h1>Pelacak Milestone PP osu!</h1>
-  <div id="description">
-    Penasaran dengan milestone PP kamu atau para top player? Silakan gunakan situs ini untuk mencari tahu!
+  <div id="playerProfile" class="player-profile">
+    <img id="playerAvatar" src="" alt="Player Avatar" style="display: none;">
+    <div id="playerInfo">
+      <h2 id="playerName"></h2>
+      <p id="playerStats"></p>
+    </div>
   </div>
-  <div id="warning">
-    Catatan: Skor milestone menunjukkan PP awal saat pertama kali disubmit. Jika tidak ada skor untuk milestone tertentu, itu mungkin karena data historis tidak tersedia.
-  </div>
+  <h1 id="title"><span>osu! Milestone PP Tracker</span></h1>
+  <div id="description"></div>
+  <div id="warning"></div>
   <div style="text-align: center;">
-    <input id="userId" placeholder="Masukkan Username osu!" type="text" onkeypress="if(event.keyCode === 13) fetchMilestones()">
+    <input id="userId" type="text" onkeypress="if(event.keyCode === 13) fetchMilestones()">
     <select id="gameMode">
       <option value="0" selected>osu!</option>
       <option value="1">osu!taiko</option>
       <option value="2">osu!catch</option>
       <option value="3">osu!mania</option>
     </select>
-    <button id="searchBtn" onclick="fetchMilestones()">Cari</button>
+    <button id="searchBtn" onclick="fetchMilestones()"></button>
   </div>
-  <div id="credit">
-    Situs web oleh Sanvie dengan API osu! dan osu!track
-  </div>
+  <div id="credit"></div>
   <div id="results"></div>
   <div id="loadingOverlay">
     <div class="loader"></div>
-    <div id="loadingText">Tunggu sebentar, sedang mengambil data...</div>
+    <div id="loadingText"></div>
   </div>
 
   <script src="script.js"></script>
