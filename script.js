@@ -8,7 +8,7 @@ const translations = {
   en: {
     title: "osu! Milestone PP Tracker",
     description: "Curious about your PP milestones or those of top players? Use this site to find out!",
-    warning: "Note: Milestone scores show the PP when first submitted. If a milestone is missing, historical data may be unavailable.",
+    warning: "Warning: Using a VPN may cause issues due to API rate limits. Please disable your VPN for the best experience",
     loading: "Please wait, fetching data...",
     placeholder: "Enter osu! Username",
     button: "Search",
@@ -25,7 +25,7 @@ const translations = {
   id: {
     title: "Pelacak Milestone PP osu!",
     description: "Penasaran dengan milestone PP kamu atau para top player? Silakan gunakan situs ini untuk mencari tahu!",
-    warning: "Catatan: Skor milestone menunjukkan PP awal saat pertama kali disubmit. Jika tidak ada skor untuk milestone tertentu, itu mungkin karena data historis tidak tersedia.",
+    warning: "Peringatan: Menggunakan VPN dapat menyebabkan masalah karena batasan tingkat API. Harap nonaktifkan VPN untuk pengalaman terbaik.",
     loading: "Tunggu sebentar, sedang mengambil data...",
     placeholder: "Masukkan Username osu!",
     button: "Cari",
