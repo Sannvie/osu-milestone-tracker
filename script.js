@@ -3,6 +3,7 @@ const OSU_API_URL = 'https://osu.ppy.sh/api';
 const OSUTRACK_API_URL = 'https://osutrack-api.ameo.dev';
 let cachedBeatmaps = new Map(); 
 
+
 const translations = {
   en: {
     title: "osu! Milestone PP Tracker",
