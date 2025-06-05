@@ -1,4 +1,4 @@
-const OSU_API_KEY = '4b29cd70e56ec0e587bd578c411b4f72a9a85c01';
+const OSU_API_KEY = '96d23ebb23a3b2740ba21a846224222079f25a02';
 const OSU_API_URL = 'https://osu.ppy.sh/api';
 const OSUTRACK_API_URL = 'https://osutrack-api.ameo.dev';
 let cachedBeatmaps = new Map(); 
