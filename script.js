@@ -18,8 +18,10 @@ const translations = {
     beatmap: "Beatmap",
     date: "Date",
     mods: "Mods",
-    rank: "Rank", 
+    rank: "Rank",
+    accuracy: "Accuracy", 
     noScores: "No scores found for this milestone.",
+    playerAvatar: "https://osu.ppy.sh/images/layout/avatar-guest.png",
     unknownDate: "Unknown Date",
   },
   id: {
@@ -36,6 +38,7 @@ const translations = {
     date: "Tanggal",
     mods: "Mod",
     rank: "Rank",
+    accuracy: "Akurasi",
     noScores: "Tidak ada skor ditemukan untuk milestone ini.",
     unknownDate: "Tanggal Tidak Diketahui",
   }
@@ -175,6 +178,33 @@ function displayUserProfile(user) {
     window.open(`https://osu.ppy.sh/users/${user.user_id}`, '_blank');
   };
 }
+function calculateAccuracy(score) {
+  const count300 = parseInt(score.count300) || 0;
+  const count100 = parseInt(score.count100) || 0;
+  const count50 = parseInt(score.count50) || 0;
+  const countmiss = parseInt(score.countmiss) || 0;
+
+  const totalHits = count300 + count100 + count50 + countmiss;
+  if (totalHits === 0) return 0;
+
+  const weightedHits = (count300 * 300) + (count100 * 100) + (count50 * 50);
+  const maxScore = totalHits * 300;
+  const accuracy = (weightedHits / maxScore) * 100;
+  return (Math.floor(accuracy * 100) / 100).toFixed(2);
+}
+async function fetchScoreDetails(userId, beatmapId, mods) {
+  const url = `${OSU_API_URL}/get_scores?k=${OSU_API_KEY}&b=${beatmapId}&u=${userId}&type=id&mods=${mods}`;
+  try {
+    const data = await fetchFromAPI(url);
+    if (data && data.length > 0) {
+      return data[0];
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching score details:', error);
+    return null;
+  }
+}
 
 async function fetchMilestones() {
   const username = document.getElementById('userId').value.trim();
@@ -245,6 +275,9 @@ async function fetchMilestones() {
       if (score) {
         const beatmap = await fetchBeatmap(score.beatmap_id);
         const formattedDate = parseDate(score.score_time) || texts.unknownDate;
+        const scoreDetails = await fetchScoreDetails(userId, score.beatmap_id, score.mods);
+        const accuracy = scoreDetails ? calculateAccuracy(scoreDetails) : 'N/A';
+        
         console.log(`Rendering milestone ${milestone}: score_time=${score.score_time}, formattedDate=${formattedDate}`);
         if (beatmap) {
           card.style.backgroundImage = `url(https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/cover.jpg)`;
@@ -253,6 +286,7 @@ async function fetchMilestones() {
               <h3>${texts.milestone}: ${milestone} PP</h3>
               <p>${texts.pp}: ${Math.round(score.pp)}</p>
               <p>${texts.rank}: ${mapRank(score.rank)}</p>
+              <p>Accuracy: ${accuracy}%</p> <!-- Tambahkan akurasi -->
               <p>${texts.beatmap}: <a href="https://osu.ppy.sh/b/${score.beatmap_id}" target="_blank">${beatmap.title} [${beatmap.version}]</a></p>
               <p>${texts.date}: ${formattedDate}</p>
               <p>${texts.mods}: ${getMods(score.mods)}</p>
@@ -288,7 +322,6 @@ async function fetchMilestones() {
     document.getElementById('searchBtn').disabled = false;
   }
 }
-
 function displayUserProfile(user) {
   const avatarUrl = `https://a.ppy.sh/${user.user_id}`;
   const playerAvatar = document.getElementById('playerAvatar');
