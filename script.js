@@ -1,8 +1,5 @@
-const OSU_API_KEY = '498fec4eb6dff7362bfba1c61abc1d0066ae8602';
-const OSU_API_URL = 'https://osu.ppy.sh/api';
-const OSUTRACK_API_URL = 'https://osutrack-api.ameo.dev';
+const OSUTRACK_API_URL = 'https://osutrack-api.ameo.dev'; 
 let cachedBeatmaps = new Map(); 
-
 
 const translations = {
   en: {
@@ -64,7 +61,6 @@ function updateLanguage() {
   document.getElementById('credit').innerText = texts.credit;
 }
 
-
 function toggleLoading(show) {
   document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
 }
@@ -81,7 +77,8 @@ async function fetchFromAPI(url, options = {}) {
 }
 
 async function getUserId(username) {
-  const url = `${OSU_API_URL}/get_user?k=${OSU_API_KEY}&u=${encodeURIComponent(username)}&type=string`;
+  // Mengarah ke backend proxy Vercel milik kita
+  const url = `/api/osu?endpoint=get_user&u=${encodeURIComponent(username)}&type=string`;
   const data = await fetchFromAPI(url);
   if (data && data.length > 0) {
     return data[0].user_id;
@@ -97,11 +94,13 @@ async function updateUserData(userId, gameMode) {
     console.warn('Failed to update user data, proceeding with existing data:', error);
   }
 }
+
 async function fetchBeatmap(beatmapId) {
   if (cachedBeatmaps.has(beatmapId)) {
     return cachedBeatmaps.get(beatmapId);
   }
-  const url = `${OSU_API_URL}/get_beatmaps?k=${OSU_API_KEY}&b=${beatmapId}`;
+  // Mengarah ke backend proxy Vercel milik kita
+  const url = `/api/osu?endpoint=get_beatmaps&b=${beatmapId}`;
   const data = await fetchFromAPI(url);
   if (data && data.length > 0) {
     cachedBeatmaps.set(beatmapId, data[0]);
@@ -125,14 +124,10 @@ function getMods(modsNumber) {
 }
 
 function parseDate(dateString) {
-  console.log('Input dateString:', dateString);
   const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    console.log('Invalid date, returning null');
-    return null; 
-  }
+  if (isNaN(date.getTime())) return null; 
   const locale = currentLanguage === 'id' ? 'id-ID' : 'en-GB';
-  const formattedDate = date.toLocaleString(locale, {
+  return date.toLocaleString(locale, {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -140,8 +135,6 @@ function parseDate(dateString) {
     minute: '2-digit',
     timeZone: 'Asia/Jakarta' 
   }).replace(/,/, '');
-  console.log('Formatted date:', formattedDate); 
-  return formattedDate;
 }
 
 function displayUserProfile(user) {
@@ -157,27 +150,25 @@ function displayUserProfile(user) {
   playerAvatar.style.display = 'block';
   playerAvatar.onerror = () => {
     playerAvatar.src = 'https://osu.ppy.sh/images/layout/avatar-guest.png'; 
-    console.log('Failed to load avatar, using fallback');
   };
 
   playerName.innerText = user.username;
 
   const stats = [
-    `${texts.pp}: ${parseFloat(user.pp_raw).toFixed(0)}`,
+    `${texts.pp}: ${Math.round(parseFloat(user.pp_raw))}`,
     `#${user.pp_rank}`,
     `Lv${parseFloat(user.level).toFixed(0)}`,
     `${parseFloat(user.accuracy).toFixed(1)}%`,
     user.country
   ];
   playerStats.innerHTML = stats.join('<br>');
-
   playerInfo.classList.add('visible');
-  console.log('Profile content displayed');
 
   playerProfile.onclick = () => {
     window.open(`https://osu.ppy.sh/users/${user.user_id}`, '_blank');
   };
 }
+
 function calculateAccuracy(score) {
   const count300 = parseInt(score.count300) || 0;
   const count100 = parseInt(score.count100) || 0;
@@ -192,18 +183,37 @@ function calculateAccuracy(score) {
   const accuracy = (weightedHits / maxScore) * 100;
   return (Math.floor(accuracy * 100) / 100).toFixed(2);
 }
+
 async function fetchScoreDetails(userId, beatmapId, mods) {
-  const url = `${OSU_API_URL}/get_scores?k=${OSU_API_KEY}&b=${beatmapId}&u=${userId}&type=id&mods=${mods}`;
+  // Mengarah ke backend proxy Vercel milik kita
+  const url = `/api/osu?endpoint=get_scores&b=${beatmapId}&u=${userId}&type=id&mods=${mods}`;
   try {
     const data = await fetchFromAPI(url);
-    if (data && data.length > 0) {
-      return data[0];
-    }
+    if (data && data.length > 0) return data[0];
     return null;
   } catch (error) {
     console.error('Error fetching score details:', error);
     return null;
   }
+}
+
+async function fetchUserProfile(username) {
+  // Mengarah ke backend proxy Vercel milik kita
+  const url = `/api/osu?endpoint=get_user&u=${encodeURIComponent(username)}&type=string`;
+  try {
+    const data = await fetchFromAPI(url);
+    if (data && data.length > 0) return data[0];
+    throw new Error('User not found');
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    throw error;
+  }
+}
+
+function mapRank(rank) {
+  if (rank === 'SH') return 'S+';
+  if (rank === 'XH') return 'SS+';
+  return rank; 
 }
 
 async function fetchMilestones() {
@@ -212,9 +222,8 @@ async function fetchMilestones() {
   const resultsDiv = document.getElementById('results');
   const playerProfile = document.getElementById('playerProfile');
   const playerInfo = document.getElementById('playerInfo');
-  console.log('Fetching milestones for user:', username, 'Mode:', gameMode);
+  
   resultsDiv.innerHTML = '';
-
   playerProfile.classList.remove('show');
   playerInfo.classList.remove('visible');
   document.getElementById('playerAvatar').style.display = 'none';
@@ -228,7 +237,6 @@ async function fetchMilestones() {
 
   toggleLoading(true);
   playerProfile.classList.add('show');
-  console.log('Profile slide down animation triggered');
   document.getElementById('searchBtn').disabled = true;
 
   try {
@@ -236,19 +244,14 @@ async function fetchMilestones() {
     displayUserProfile(user);
 
     const userId = user.user_id;
-    console.log('User ID:', userId);
     await updateUserData(userId, gameMode);
 
     const scoresUrl = `${OSUTRACK_API_URL}/hiscores?user=${encodeURIComponent(username)}&mode=${gameMode}&userMode=username`;
     const scores = await fetchFromAPI(scoresUrl);
-    console.log('Scores from API:', scores);
 
     const highestPP = scores.length > 0 ? Math.round(Math.max(...scores.map(s => s.pp))) : 0;
-    console.log('Highest PP:', highestPP);
     if (highestPP === 0) {
       resultsDiv.innerHTML = `<p style="color: #e74c3c; text-align: center;">${translations[currentLanguage].noScores}</p>`;
-      toggleLoading(false);
-      document.getElementById('searchBtn').disabled = false;
       return;
     }
 
@@ -256,7 +259,6 @@ async function fetchMilestones() {
     for (let i = 100; i <= Math.ceil(highestPP / 50) * 50; i += 50) {
       if (i !== 50) milestones.push(i);
     }
-    console.log('Milestones:', milestones);
 
     const milestoneScores = [];
     for (const milestone of milestones) {
@@ -264,7 +266,6 @@ async function fetchMilestones() {
       const maxPP = milestone + 49;
       const score = scores.find(s => Math.round(s.pp) >= minPP && Math.round(s.pp) <= maxPP);
       milestoneScores.push({ milestone, score });
-      console.log(`Milestone ${milestone}:`, score);
     }
 
     for (const { milestone, score } of milestoneScores) {
@@ -278,7 +279,6 @@ async function fetchMilestones() {
         const scoreDetails = await fetchScoreDetails(userId, score.beatmap_id, score.mods);
         const accuracy = scoreDetails ? calculateAccuracy(scoreDetails) : 'N/A';
         
-        console.log(`Rendering milestone ${milestone}: score_time=${score.score_time}, formattedDate=${formattedDate}`);
         if (beatmap) {
           card.style.backgroundImage = `url(https://assets.ppy.sh/beatmaps/${beatmap.beatmapset_id}/covers/cover.jpg)`;
           card.innerHTML = `
@@ -286,7 +286,7 @@ async function fetchMilestones() {
               <h3>${texts.milestone}: ${milestone} PP</h3>
               <p>${texts.pp}: ${Math.round(score.pp)}</p>
               <p>${texts.rank}: ${mapRank(score.rank)}</p>
-              <p>Accuracy: ${accuracy}%</p> <!-- Tambahkan akurasi -->
+              <p>Accuracy: ${accuracy}%</p>
               <p>${texts.beatmap}: <a href="https://osu.ppy.sh/b/${score.beatmap_id}" target="_blank">${beatmap.title} [${beatmap.version}]</a></p>
               <p>${texts.date}: ${formattedDate}</p>
               <p>${texts.mods}: ${getMods(score.mods)}</p>
@@ -296,20 +296,10 @@ async function fetchMilestones() {
             window.open(`https://osu.ppy.sh/b/${score.beatmap_id}`, '_blank');
           });
         } else {
-          card.innerHTML = `
-            <div>
-              <h3>${texts.milestone}: ${milestone} PP</h3>
-              <p>${texts.noScores}</p>
-            </div>
-          `;
+          card.innerHTML = `<div><h3>${texts.milestone}: ${milestone} PP</h3><p>${texts.noScores}</p></div>`;
         }
       } else {
-        card.innerHTML = `
-          <div>
-            <h3>${texts.milestone}: ${milestone} PP</h3>
-            <p>${texts.noScores}</p>
-          </div>
-        `;
+        card.innerHTML = `<div><h3>${texts.milestone}: ${milestone} PP</h3><p>${texts.noScores}</p></div>`;
       }
       resultsDiv.appendChild(card);
     }
@@ -322,57 +312,3 @@ async function fetchMilestones() {
     document.getElementById('searchBtn').disabled = false;
   }
 }
-function displayUserProfile(user) {
-  const avatarUrl = `https://a.ppy.sh/${user.user_id}`;
-  const playerAvatar = document.getElementById('playerAvatar');
-  const playerName = document.getElementById('playerName');
-  const playerStats = document.getElementById('playerStats');
-  const playerProfile = document.getElementById('playerProfile');
-  const playerInfo = document.getElementById('playerInfo');
-  const texts = translations[currentLanguage];
-
-  playerAvatar.src = avatarUrl;
-  playerAvatar.style.display = 'block';
-  playerAvatar.onerror = () => {
-    playerAvatar.src = 'https://osu.ppy.sh/images/layout/avatar-guest.png';
-    console.log('Failed to load avatar, using fallback');
-  };
-
-  playerName.innerText = user.username;
-
-  const stats = [
-    `${texts.pp}: ${Math.round(parseFloat(user.pp_raw))}`,
-    `#${user.pp_rank}`,
-    `Lv${parseFloat(user.level).toFixed(0)}`,
-    `${parseFloat(user.accuracy).toFixed(1)}%`,
-    user.country
-  ];
-  playerStats.innerHTML = stats.join('<br>');
-
-  playerInfo.classList.add('visible');
-  console.log('Profile content displayed');
-
-  playerProfile.onclick = () => {
-    window.open(`https://osu.ppy.sh/users/${user.user_id}`, '_blank');
-  };
-}
-function mapRank(rank) {
-  if (rank === 'SH') return 'S+';
-  if (rank === 'XH') return 'SS+';
-  return rank; 
-}
-async function fetchUserProfile(username) {
-  const url = `${OSU_API_URL}/get_user?k=${OSU_API_KEY}&u=${encodeURIComponent(username)}&type=string`;
-  try {
-    const data = await fetchFromAPI(url);
-    if (data && data.length > 0) {
-      return data[0];
-    }
-    throw new Error('User not found');
-  } catch (error) {
-    console.error('Error fetching user profile:', error);
-    throw error;
-  }
-}
-
-
