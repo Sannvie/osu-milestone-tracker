@@ -5,7 +5,9 @@ const translations = {
   en: {
     title: "osu! Milestone PP Tracker",
     description: "Curious about your PP milestones or those of top players? Use this site to find out!",
-    warning: "Warning: Using a VPN may cause issues due to API rate limits. Please disable your VPN for the best experience",
+    warning: 'The website has moved to a new address: <a href="https://osu-milestone-tracker.vercel.app/" target="_blank" style="color: #ff66aa; text-decoration: underline;">osu-milestone-tracker.vercel.app</a>',
+    loading: "Please wait, fetching data...",
+    placeholder: "Enter osu! Username",
     loading: "Please wait, fetching data...",
     placeholder: "Enter osu! Username",
     button: "Search",
@@ -24,7 +26,7 @@ const translations = {
   id: {
     title: "Pelacak Milestone PP osu!",
     description: "Penasaran dengan milestone PP kamu atau para top player? Silakan gunakan situs ini untuk mencari tahu!",
-    warning: "Peringatan: Menggunakan VPN dapat menyebabkan masalah karena batasan tingkat API. Harap nonaktifkan VPN untuk pengalaman terbaik.",
+    warning: "Website telah pindah ke alamat baru: https://osu-milestone-tracker.vercel.app/",
     loading: "Tunggu sebentar, sedang mengambil data...",
     placeholder: "Masukkan Username osu!",
     button: "Cari",
@@ -54,7 +56,7 @@ function updateLanguage() {
   const texts = translations[currentLanguage];
   document.getElementById('title').innerText = texts.title; 
   document.getElementById('description').innerText = texts.description;
-  document.getElementById('warning').innerText = texts.warning;
+  document.getElementById('warning').innerHTML = texts.warning;
   document.getElementById('loadingText').innerText = texts.loading;
   document.getElementById('userId').placeholder = texts.placeholder;
   document.getElementById('searchBtn').innerText = texts.button;
