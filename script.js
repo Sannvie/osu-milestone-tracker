@@ -5,7 +5,7 @@ const translations = {
   en: {
     title: "osu! Milestone PP Tracker",
     description: "Curious about your PP milestones or those of top players? Use this site to find out!",
-    warning: 'The website has moved to a new address: <a href="https://osu-milestone-tracker.vercel.app/" target="_blank" style="color: #ff66aa; text-decoration: underline;">osu-milestone-tracker.vercel.app</a>',
+    warning: 'The website has moved to a new address: <a href="https://osu-milestone-tracker.vercel.app/" target="_blank" style="color: #ff66aa; text-decoration: underline;">osu-milestone-tracker.vercel.app</a> and do not use vpn',
     loading: "Please wait, fetching data...",
     placeholder: "Enter osu! Username",
     loading: "Please wait, fetching data...",
